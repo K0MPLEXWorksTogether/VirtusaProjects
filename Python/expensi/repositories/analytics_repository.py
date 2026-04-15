@@ -4,6 +4,7 @@ from matplotlib.figure import Figure
 from repositories.expense_repository import ExpenseRepository
 from models.analytics import Analytics
 
+
 class AnalyticsRepository:
     def __init__(self, expense_repository: ExpenseRepository):
         self.__expense_repository = expense_repository
@@ -23,7 +24,7 @@ class AnalyticsRepository:
         labels = list(breakdown.keys())
         sizes = list(breakdown.values())
 
-        ax.pie(sizes, labels=labels, autopct='%1.1f%%')
+        ax.pie(sizes, labels=labels, autopct="%1.1f%%")
         ax.set_title("Category-wise Spending")
         return fig
 
@@ -38,7 +39,7 @@ class AnalyticsRepository:
         labels = list(monthly.keys())
         sizes = list(monthly.values())
 
-        ax.pie(sizes, labels=labels, autopct='%1.1f%%')
+        ax.pie(sizes, labels=labels, autopct="%1.1f%%")
         ax.set_title("Monthly Spending Distribution")
 
         return fig

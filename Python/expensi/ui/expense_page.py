@@ -1,96 +1,110 @@
 import tkinter as tk
 from tkinter import ttk
-from datetime import datetime
 
 from repositories.expense_repository import ExpenseRepository
+from repositories.category_repository import CategoryRepository
 from models.expense import Expense
 from models.category import Category
+from datetime import datetime
 
-class ExpensePage:
-    def __init__(self, expense_repo: ExpenseRepository):
-        self.root = tk.Tk()
-        self.root.title("Expenses")
-        self.root.geometry("900x600")
-        self.expense_repo = expense_repo
 
-        self.columns = ("Date", "Category", "Amount", "Description")
-        main_frame = tk.Frame(self.root)
-        main_frame.pack(fill="both", expand=True, padx=10, pady=10)
-        table_frame = tk.Frame(main_frame)
-        table_frame.pack(fill="both", expand=True)
+class ExpensePage(tk.Frame):
+    def __init__(
+        self, master, expense_repo: ExpenseRepository, category_repo: CategoryRepository
+    ):
+        super().__init__(master)
 
-        self.tree = ttk.Treeview(table_frame, columns=self.columns, show="headings")
+        self.repo = expense_repo
+        self.category_repo = category_repo
 
-        for col in self.columns:
-            self.tree.heading(col, text=col)
-            self.tree.column(col, anchor="center", width=150)
-        self.load_rows()
-        scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree.yview)
-        self.tree.configure(yscroll=scrollbar.set)
+        nav_frame = tk.Frame(self)
+        nav_frame.pack()
+        tk.Button(
+            nav_frame,
+            text="Go to Categories",
+            command=lambda: master.switch_frame("category"),
+        ).pack()
+        tk.Button(
+            nav_frame,
+            text="Go to Analytics",
+            command=lambda: master.switch_frame("analytics"),
+        ).pack()
 
-        self.tree.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-        button_frame = tk.Frame(main_frame)
-        button_frame.pack(fill="x", pady=10)
+        title = tk.Label(self, text="Expenses", font=("Arial", 18))
+        title.pack(pady=10)
+        self.tree = ttk.Treeview(
+            self, columns=("date", "category", "amount", "description"), show="headings"
+        )
 
-        add_button = tk.Button(button_frame, text="Add Expense", width=15, command=self.add_expense)
-        delete_button = tk.Button(button_frame, text="Delete All", width=15, command=self.expense_repo.delete_all)
+        for col in ("date", "category", "amount", "description"):
+            self.tree.heading(col, text=col.capitalize())
 
-        add_button.pack(side="left", padx=10)
-        delete_button.pack(side="left", padx=10)
+        self.tree.pack(fill="both", expand=True, padx=20, pady=10)
+        btn_frame = tk.Frame(self)
+        btn_frame.pack(pady=10)
 
-    def load_rows(self):
-        data = self.expense_repo.find_all()
-        for row in data:
-            self.tree.insert("", tk.END, values=row)
+        tk.Button(btn_frame, text="Add Expense", command=self.open_add_window).pack(
+            side="left", padx=5
+        )
+        tk.Button(btn_frame, text="Delete All", command=self.delete_all).pack(
+            side="left", padx=5
+        )
 
-    def add_expense(self):
-        dialog = tk.Toplevel(self.root)
-        dialog.title("Add Expense")
-        dialog.geometry("300x300")
+        self.load_data()
 
-        tk.Label(dialog, text="Date (YYYY-MM-DD)").pack()
-        date_entry = tk.Entry(dialog)
+    def load_data(self):
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+
+        for expense in self.repo.find_all():
+            self.tree.insert(
+                "",
+                "end",
+                values=(
+                    expense.get_date().strftime("%Y-%m-%d"),
+                    expense.get_category().get_name(),
+                    expense.get_amount(),
+                    expense.get_description(),
+                ),
+            )
+
+    def delete_all(self):
+        self.repo.delete_all()
+        self.load_data()
+
+    def open_add_window(self):
+        win = tk.Toplevel(self)
+        win.title("Add Expense")
+        win.geometry("300x300")
+
+        tk.Label(win, text="Date (YYYY-MM-DD)").pack()
+        date_entry = tk.Entry(win)
         date_entry.pack()
 
-        tk.Label(dialog, text="Category").pack()
-        category_entry = tk.Entry(dialog)
+        tk.Label(win, text="Category").pack()
+        category_entry = tk.Entry(win)
         category_entry.pack()
 
-        tk.Label(dialog, text="Amount").pack()
-        amount_entry = tk.Entry(dialog)
+        tk.Label(win, text="Amount").pack()
+        amount_entry = tk.Entry(win)
         amount_entry.pack()
 
-        tk.Label(dialog, text="Description").pack()
-        desc_entry = tk.Entry(dialog)
+        tk.Label(win, text="Description").pack()
+        desc_entry = tk.Entry(win)
         desc_entry.pack()
-        tk.Button(
-            dialog,
-            text="Save",
-            command=lambda: self.__submit(
-                dialog,
-                date_entry,
-                category_entry,
-                amount_entry,
-                desc_entry
-            )
-        ).pack(pady=10)
 
-    def __submit(self, dialog, date_entry, category_entry, amount_entry, desc_entry) -> None:
-        try:
+        def save():
             expense = Expense(
                 date=datetime.strptime(date_entry.get(), "%Y-%m-%d"),
                 category=Category(category_entry.get()),
                 amount=float(amount_entry.get()),
-                description=desc_entry.get()
+                description=desc_entry.get(),
             )
-            self.expense_repo.save(expense)
-            self.load_rows()
 
-            dialog.destroy()
+            self.repo.save(expense)
+            if not (self.category_repo.exists(category_entry.get())):
+                self.category_repo.save(Category(category_entry.get()))
+            win.destroy()
+            self.load_data()
 
-        except Exception as e:
-            print("Error:", e)
-
-    def run(self):
-        self.root.mainloop()
+        tk.Button(win, text="Save", command=save).pack(pady=10)

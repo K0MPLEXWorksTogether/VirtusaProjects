@@ -11,9 +11,7 @@ class Category:
         self.__name = name.strip()
 
     def to_dict(self):
-        return {
-            "name": self.__name
-        }
+        return {"name": self.__name}
 
     @staticmethod
     def from_dict(data: dict):

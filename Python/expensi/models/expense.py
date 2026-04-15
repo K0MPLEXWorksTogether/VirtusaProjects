@@ -1,8 +1,11 @@
 from datetime import datetime
 from models.category import Category
 
+
 class Expense:
-    def __init__(self, date: datetime, category: Category, amount: float, description: str):
+    def __init__(
+        self, date: datetime, category: Category, amount: float, description: str
+    ):
         self.__date = date
         self.__category = category
         self.__amount = amount
@@ -43,7 +46,7 @@ class Expense:
             "date": self.__date.strftime("%Y-%m-%d"),
             "category": self.__category.get_name(),
             "amount": self.__amount,
-            "description": self.__description
+            "description": self.__description,
         }
 
     @staticmethod
@@ -52,7 +55,7 @@ class Expense:
             date=datetime.strptime(data["date"], "%Y-%m-%d"),
             category=Category(data["category"]),
             amount=data["amount"],
-            description=data["description"]
+            description=data["description"],
         )
 
     def __str__(self):

@@ -12,11 +12,7 @@ class ExpenseRepository:
         CSVUtils.ensure_file_exists(self.__file_path, self.__headers)
 
     def save(self, expense: Expense):
-        CSVUtils.append_row(
-            self.__file_path,
-            expense.to_dict(),
-            self.__headers
-        )
+        CSVUtils.append_row(self.__file_path, expense.to_dict(), self.__headers)
 
     def find_all(self) -> list:
         rows = CSVUtils.read_all(self.__file_path)
@@ -35,5 +31,5 @@ class ExpenseRepository:
             date=datetime.strptime(row["date"], "%Y-%m-%d"),
             category=category,
             amount=float(row["amount"]),
-            description=row["description"]
+            description=row["description"],
         )
