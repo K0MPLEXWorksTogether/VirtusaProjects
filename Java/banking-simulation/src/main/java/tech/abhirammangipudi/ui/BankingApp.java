@@ -1,32 +1,36 @@
 package tech.abhirammangipudi.ui;
 
 import javax.swing.*;
-
-import tech.abhirammangipudi.services.CurrentAccountService;
-import tech.abhirammangipudi.services.SavingsAccountService;
-import tech.abhirammangipudi.services.TransferService;
-import tech.abhirammangipudi.services.UserService;
-import tech.abhirammangipudi.ui.common.LandingPage;
-import tech.abhirammangipudi.ui.user.DashboardPage;
-import tech.abhirammangipudi.ui.user.LoginPage;
-import tech.abhirammangipudi.ui.user.SignupPage;
-
 import java.awt.*;
+
+import tech.abhirammangipudi.repositories.TransactionRepository;
+import tech.abhirammangipudi.services.*;
+import tech.abhirammangipudi.ui.bank.*;
+import tech.abhirammangipudi.ui.common.*;
+import tech.abhirammangipudi.ui.user.*;
 
 public class BankingApp {
     private JFrame frame;
     private CardLayout cardLayout;
     private JPanel container;
 
-    public BankingApp(UserService userService, SavingsAccountService savingsService, CurrentAccountService currentAccountService, TransferService transferService) {
+    public BankingApp(UserService userService, SavingsAccountService savingsService, CurrentAccountService currentAccountService, TransferService transferService, BankService bankService, TransactionRepository transactionRepository) {
         frame = new JFrame("Demo Bank");
         cardLayout = new CardLayout();
         container = new JPanel(cardLayout);
 
+        TransactionsPage transactionsPage = new TransactionsPage(this, transactionRepository);
         LandingPage landingPage = new LandingPage(this);
+        BankLogin bankLogin = new BankLogin(this, bankService);
+        BankDashboard bankDashboard = new BankDashboard(this, bankService, transactionsPage);
         LoginPage loginPage = new LoginPage(this, userService);
         SignupPage signupPage = new SignupPage(this, userService);
-        DashboardPage dashboardPage = new DashboardPage(this, savingsService, currentAccountService, transferService);
+        DashboardPage dashboardPage = new DashboardPage(this, savingsService, currentAccountService, transferService,
+                transactionsPage);
+                
+        container.add(bankLogin, "bankLogin");
+        container.add(bankDashboard, "bankDashboard");
+        container.add(transactionsPage, "transactionsPage");
         container.add(landingPage, "landing");
         container.add(loginPage, "login");
         container.add(signupPage, "signup");

@@ -6,7 +6,6 @@ import tech.abhirammangipudi.models.User;
 import tech.abhirammangipudi.errors.AuthenticationException;
 import tech.abhirammangipudi.errors.ResourceNotFoundException;
 import tech.abhirammangipudi.errors.ResourceAlreadyExistsException;
-import tech.abhirammangipudi.utils.PasswordUtils;
 
 public class UserService implements Authenticate<User> {
     private final UserRepository userRepository;

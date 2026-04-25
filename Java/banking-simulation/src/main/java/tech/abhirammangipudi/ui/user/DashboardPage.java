@@ -5,12 +5,14 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.swing.table.DefaultTableModel;
 
 import tech.abhirammangipudi.models.Account;
 import tech.abhirammangipudi.services.CurrentAccountService;
 import tech.abhirammangipudi.services.SavingsAccountService;
 import tech.abhirammangipudi.services.TransferService;
 import tech.abhirammangipudi.ui.BankingApp;
+import tech.abhirammangipudi.ui.common.TransactionsPage;
 
 public class DashboardPage extends JPanel {
     private JTable table;
@@ -68,6 +70,9 @@ public class DashboardPage extends JPanel {
             data[i][0] = accounts.get(i).getAccountNumber();
             data[i][1] = accounts.get(i).checkBalance();
         }
+
+        String[] columnNames = { "Account Number", "Balanace" };
+        table.setModel(new DefaultTableModel(data, columnNames));
     }
 
     private void handleDeposit() {
@@ -172,7 +177,7 @@ public class DashboardPage extends JPanel {
     }
 
     public DashboardPage(BankingApp app, SavingsAccountService savingsService, CurrentAccountService currentService,
-            TransferService transferService) {
+            TransferService transferService, TransactionsPage transactionsPage) {
         this.savingsService = savingsService;
         this.currentService = currentService;
         this.transferService = transferService;
@@ -196,22 +201,29 @@ public class DashboardPage extends JPanel {
         JButton withdraw = new JButton("Withdraw");
         JButton transfer = new JButton("Transfer");
         JButton checkBalance = new JButton("Check Balance");
+        JButton showTransactions = new JButton("Show Transactions");
 
         actions.add(deposit);
         actions.add(withdraw);
         actions.add(transfer);
         actions.add(checkBalance);
+        actions.add(showTransactions);
 
         deposit.addActionListener(e -> handleDeposit());
         withdraw.addActionListener(e -> handleWithdraw());
         transfer.addActionListener(e -> handleTransfer());
         checkBalance.addActionListener(e -> handleCheckBalance());
+        showTransactions.addActionListener(e -> {
+            transactionsPage.setAccountId(getSelectedAccount().getAccountNumber());
+            app.showPage("transactionsPage");
+        });
 
         JPanel left = new JPanel();
         JButton createSavingsButton = new JButton("Create Savings Account");
         JButton createCurrentButton = new JButton("Create Current Account");
         left.add(createCurrentButton);
         left.add(createSavingsButton);
+        left.setPreferredSize(new Dimension(200, 0));
 
         add(left, BorderLayout.EAST);
         add(top, BorderLayout.NORTH);

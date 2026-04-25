@@ -113,7 +113,25 @@ public class TransactionRepository implements Repository<Transaction, UUID> {
 
             return transactions;
         } catch (SQLException | ConnectionError e) {
-            throw new RuntimeException("Database error during transaction save: " + e.getMessage());
+            throw new RuntimeException("Database error during transaction fetch: " + e.getMessage());
+        }
+    }
+
+    public List<Transaction> findByAccountId(UUID accountId) throws ResourceNotFoundException {
+        String sql = "SELECT * FROM Transactions WHERE accountId = ?";
+        List<Transaction> transactions = new ArrayList<>();
+        try (Connection conn = ConnectionSingleton.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, accountId.toString());
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                transactions.add(mapper(rs));
+            }
+
+            return transactions;
+        } catch (SQLException | ConnectionError e) {
+            throw new RuntimeException("Database error during transaction fetch: " + e.getMessage());
         }
     }
 }

@@ -1,40 +1,36 @@
-package tech.abhirammangipudi.ui.user;
+package tech.abhirammangipudi.ui.bank;
 
 import javax.swing.*;
 import java.awt.*;
 
-import tech.abhirammangipudi.ui.BankingApp;
 import tech.abhirammangipudi.errors.AuthenticationException;
-import tech.abhirammangipudi.services.UserService;;
+import tech.abhirammangipudi.services.BankService;
+import tech.abhirammangipudi.ui.BankingApp;
 
-public class LoginPage extends JPanel {
-    public LoginPage(BankingApp app, UserService userService) {
+public class BankLogin extends JPanel {
+    public BankLogin(BankingApp app, BankService bankService) {
         setLayout(new GridLayout(5, 2));
         JTextField username = new JTextField();
         JPasswordField password = new JPasswordField();
-
         JButton login = new JButton("Login");
-        JButton signup = new JButton("Sign Up");
 
         login.addActionListener(e -> {
-            String uname = username.getText();
-            String pwd = new String(password.getPassword());
+            String bankUName = username.getText();
+            String bankPwd = new String(password.getPassword());
 
             try {
-                userService.login(uname, pwd);
+                bankService.login(bankUName, bankPwd);
                 JOptionPane.showMessageDialog(this, "Login successful!");
-                app.showPage("dashboard");
+                app.showPage("bankDashboard");
             } catch (AuthenticationException ae) {
                 JOptionPane.showConfirmDialog(this, ae.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        signup.addActionListener(e -> app.showPage("signup"));
         add(new JLabel("Username:"));
         add(username);
         add(new JLabel("Password:"));
         add(password);
         add(login);
-        add(signup);
     }
 }

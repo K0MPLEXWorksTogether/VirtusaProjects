@@ -20,7 +20,6 @@ public class CurrentAccountRepository implements Repository<CurrentAccount, UUID
     }
 
     private CurrentAccount mapper(ResultSet rs) throws SQLException, ResourceNotFoundException {
-        // Rehydrate the User associated with this account
         UUID userId = UUID.fromString(rs.getString("accountHolder"));
         User holder = userRepo.findById(userId);
 

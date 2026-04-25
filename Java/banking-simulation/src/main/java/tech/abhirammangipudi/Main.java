@@ -2,6 +2,7 @@ package tech.abhirammangipudi;
 
 import javax.swing.*;
 
+
 import tech.abhirammangipudi.repositories.*;
 import tech.abhirammangipudi.services.*;
 import tech.abhirammangipudi.ui.BankingApp;
@@ -20,7 +21,10 @@ public class Main {
             CurrentAccountService currentService = new CurrentAccountService(currentAccountRepository,
                     transactionRepository, userService);
             TransferService transferService = new TransferService(userService, transactionRepository);
-            new BankingApp(userService, savingsService, currentService, transferService);
+
+            BankService bankService = new BankService(savingsRepo, currentAccountRepository, "SampleBank",
+                    "SamplePassword");
+            new BankingApp(userService, savingsService, currentService, transferService, bankService, transactionRepository);
         });
     }
 }

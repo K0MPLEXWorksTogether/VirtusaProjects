@@ -35,7 +35,7 @@ public class SavingsAccount extends Account implements Withdraw {
         return interestRate;
     }
 
-    public void calculateinterest() throws InvalidAmountException {
+    public void depositInterest() throws InvalidAmountException {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime lastInterestDate = getDateOpened();
 

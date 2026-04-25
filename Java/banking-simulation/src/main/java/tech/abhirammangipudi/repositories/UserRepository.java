@@ -1,26 +1,17 @@
 package tech.abhirammangipudi.repositories;
 
-import tech.abhirammangipudi.interfaces.Repository;
-import tech.abhirammangipudi.models.CurrentAccount;
-import tech.abhirammangipudi.models.SavingsAccount;
-import tech.abhirammangipudi.models.Transaction;
-import tech.abhirammangipudi.models.User;
-import tech.abhirammangipudi.utils.ConnectionSingleton;
-import tech.abhirammangipudi.errors.ResourceNotFoundException;
-import tech.abhirammangipudi.errors.ConnectionError;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import tech.abhirammangipudi.interfaces.Repository;
+import tech.abhirammangipudi.models.User;
+import tech.abhirammangipudi.utils.ConnectionSingleton;
+import tech.abhirammangipudi.errors.ResourceNotFoundException;
+import tech.abhirammangipudi.errors.ConnectionError;
+
 public class UserRepository implements Repository<User, UUID> {
-    private final TransactionRepository transactionRepository;
-
-    public UserRepository() {
-        this.transactionRepository = new TransactionRepository();
-    }
-
     private User mapper(ResultSet rs) throws SQLException {
         return new User(
                 UUID.fromString(rs.getString(
