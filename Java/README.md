@@ -3,7 +3,7 @@
 This project simulates a user client and service, as well as the bank client and services. It stores the data persistently in a MySQL database, and displays the user UI for interaction.
 
 ## Demo Video
-![Bank Demo](assets/vokoscreenNG-2026-04-26_12-40-55.mp4)
+![Bank Demo](https://raw.githubusercontent.com/K0MPLEXWorksTogether/VirtusaProjects/main/Java/assets/vokoscreenNG-2026-04-26_12-40-55.mp4)
 
 ## Models
 The models are the basic design blocks of this project. They are encapsulated classes with properties and methods. They are the objects that will hold the current state of the application.
