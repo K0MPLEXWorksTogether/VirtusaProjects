@@ -97,4 +97,12 @@ public class SavingsAccountService {
 
         return account.getMinimumBalance();
     }
+
+    public SavingsAccount findById(UUID id) throws ResourceNotFoundException {
+        return savingsAccountRepository.findById(id);
+    }
+
+    public void save(SavingsAccount account) {
+        savingsAccountRepository.save(account);
+    }
 }

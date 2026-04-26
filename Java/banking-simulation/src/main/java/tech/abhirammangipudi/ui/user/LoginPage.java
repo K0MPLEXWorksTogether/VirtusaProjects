@@ -15,6 +15,8 @@ public class LoginPage extends JPanel {
 
         JButton login = new JButton("Login");
         JButton signup = new JButton("Sign Up");
+        JButton back = new JButton("Back");
+        back.addActionListener(e -> app.showPage("landing"));
 
         login.addActionListener(e -> {
             String uname = username.getText();
@@ -36,5 +38,6 @@ public class LoginPage extends JPanel {
         add(password);
         add(login);
         add(signup);
+        add(back);
     }
 }

@@ -90,4 +90,12 @@ public class CurrentAccountService {
 
         return account.checkBalance();
     }
+
+    public CurrentAccount findById(UUID id) throws ResourceNotFoundException {
+        return currentAccountRepository.findById(id);
+    }
+
+    public void save(CurrentAccount entity) {
+        currentAccountRepository.save(entity);
+    }
 }

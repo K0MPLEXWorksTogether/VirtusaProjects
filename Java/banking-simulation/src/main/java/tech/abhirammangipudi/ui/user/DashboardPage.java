@@ -7,10 +7,14 @@ import java.util.List;
 import java.util.UUID;
 import javax.swing.table.DefaultTableModel;
 
+import tech.abhirammangipudi.errors.AuthenticationException;
 import tech.abhirammangipudi.models.Account;
+import tech.abhirammangipudi.models.CurrentAccount;
+import tech.abhirammangipudi.models.SavingsAccount;
 import tech.abhirammangipudi.services.CurrentAccountService;
 import tech.abhirammangipudi.services.SavingsAccountService;
 import tech.abhirammangipudi.services.TransferService;
+import tech.abhirammangipudi.services.UserService;
 import tech.abhirammangipudi.ui.BankingApp;
 import tech.abhirammangipudi.ui.common.TransactionsPage;
 
@@ -21,6 +25,7 @@ public class DashboardPage extends JPanel {
     private final SavingsAccountService savingsService;
     private final CurrentAccountService currentService;
     private final TransferService transferService;
+    private final UserService userService;
     private String currentType = "SAVINGS";
 
     private void showError(Exception e) {
@@ -46,7 +51,7 @@ public class DashboardPage extends JPanel {
     private void loadSavings() {
         try {
             currentType = "SAVINGS";
-            accounts = new ArrayList<>(savingsService.getSavingsAccounts(1,10));
+            accounts = new ArrayList<>(savingsService.getSavingsAccounts(1, 10));
             refreshTable();
         } catch (Exception e) {
             showError(e);
@@ -56,7 +61,7 @@ public class DashboardPage extends JPanel {
     private void loadCurrent() {
         try {
             currentType = "CURRENT";
-            accounts = new ArrayList<>(currentService.getCurrentAccounts(1,10));
+            accounts = new ArrayList<>(currentService.getCurrentAccounts(1, 10));
             refreshTable();
         } catch (Exception e) {
             showError(e);
@@ -73,6 +78,44 @@ public class DashboardPage extends JPanel {
 
         String[] columnNames = { "Account Number", "Balanace" };
         table.setModel(new DefaultTableModel(data, columnNames));
+    }
+
+    private void handleCreateSavingsAccount() {
+        String initialAmountString = JOptionPane.showInputDialog("Enter Initial Deposit: ");
+        Double initialAmount = Double.parseDouble(initialAmountString);
+        if (initialAmount < 300.0) {
+            JOptionPane.showMessageDialog(this, "The minimum deposit needs are $300");
+            return;
+        }
+
+        try {
+            SavingsAccount newSavingsAccount = new SavingsAccount(userService.getCurrentUser(), initialAmount, 300.0,
+                    5.0);
+            savingsService.save(newSavingsAccount);
+        } catch (AuthenticationException ae) {
+            showError(ae);
+        }
+
+        refreshAfterAction();
+    }
+
+    private void handleCreateCurrentAccount() {
+        String initialAmountString = JOptionPane.showInputDialog("Enter Initial Deposit: ");
+        Double initialAmount = Double.parseDouble(initialAmountString);
+        if (initialAmount < 0) {
+            JOptionPane.showMessageDialog(this, "The amount entered is less than 0");
+            return;
+        }
+        
+        try {
+            CurrentAccount newSavingsAccount = new CurrentAccount(userService.getCurrentUser(), initialAmount, 300.0,
+                    300.0);
+            currentService.save(newSavingsAccount);
+        } catch (AuthenticationException ae) {
+            showError(ae);
+        }
+
+        refreshAfterAction();
     }
 
     private void handleDeposit() {
@@ -161,10 +204,12 @@ public class DashboardPage extends JPanel {
             UUID destId = UUID.fromString(destIdStr);
             double amt = Double.parseDouble(amtStr);
 
-            Account destination = accounts.stream()
-                    .filter(a -> a.getAccountNumber().equals(destId))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Destination not found"));
+            Account destination;
+            if (savingsService.findById(destId) instanceof SavingsAccount) {
+                destination = savingsService.findById(destId);
+            } else {
+                destination = currentService.findById(destId);
+            }
 
             transferService.transfer(source, destination, amt);
 
@@ -177,10 +222,12 @@ public class DashboardPage extends JPanel {
     }
 
     public DashboardPage(BankingApp app, SavingsAccountService savingsService, CurrentAccountService currentService,
-            TransferService transferService, TransactionsPage transactionsPage) {
+            TransferService transferService, TransactionsPage transactionsPage, UserService userService) {
+        setName("userDashboard");
         this.savingsService = savingsService;
         this.currentService = currentService;
         this.transferService = transferService;
+        this.userService = userService;
         setLayout(new BorderLayout());
 
         JPanel top = new JPanel();
@@ -202,12 +249,14 @@ public class DashboardPage extends JPanel {
         JButton transfer = new JButton("Transfer");
         JButton checkBalance = new JButton("Check Balance");
         JButton showTransactions = new JButton("Show Transactions");
+        JButton back = new JButton("Back");
 
         actions.add(deposit);
         actions.add(withdraw);
         actions.add(transfer);
         actions.add(checkBalance);
         actions.add(showTransactions);
+        actions.add(back);
 
         deposit.addActionListener(e -> handleDeposit());
         withdraw.addActionListener(e -> handleWithdraw());
@@ -217,6 +266,7 @@ public class DashboardPage extends JPanel {
             transactionsPage.setAccountId(getSelectedAccount().getAccountNumber());
             app.showPage("transactionsPage");
         });
+        back.addActionListener(e -> app.showPage("login"));
 
         JPanel left = new JPanel();
         JButton createSavingsButton = new JButton("Create Savings Account");
@@ -224,6 +274,8 @@ public class DashboardPage extends JPanel {
         left.add(createCurrentButton);
         left.add(createSavingsButton);
         left.setPreferredSize(new Dimension(200, 0));
+        createCurrentButton.addActionListener(e -> handleCreateCurrentAccount());
+        createSavingsButton.addActionListener(e -> handleCreateSavingsAccount());
 
         add(left, BorderLayout.EAST);
         add(top, BorderLayout.NORTH);

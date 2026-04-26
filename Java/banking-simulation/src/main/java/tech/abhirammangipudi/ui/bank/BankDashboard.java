@@ -26,7 +26,6 @@ public class BankDashboard extends JPanel {
             JOptionPane.showMessageDialog(this, "Select an account first");
             return null;
         }
-        System.out.println(accounts.size());
         return accounts.get(row);
     }
 
@@ -61,6 +60,7 @@ public class BankDashboard extends JPanel {
     }
 
     public BankDashboard(BankingApp app, BankService bankService, TransactionsPage transactionsPage) {
+        setName("bankDashboard");
         this.bankService = bankService;
         setLayout(new BorderLayout());
         table = new JTable();
@@ -70,10 +70,12 @@ public class BankDashboard extends JPanel {
         JButton intrest = new JButton("Pay Intrest");
         JButton assets = new JButton("Get Bank Assets");
         JButton transactions = new JButton("Get Transactions");
+        JButton back = new JButton("Back");
         actions.add(intrest);
         actions.add(assets);
         actions.add(transactions);
 
+        back.addActionListener(e -> app.showPage("bankLogin"));
         intrest.addActionListener(e -> {
             try {
                 this.bankService.processIntrest();

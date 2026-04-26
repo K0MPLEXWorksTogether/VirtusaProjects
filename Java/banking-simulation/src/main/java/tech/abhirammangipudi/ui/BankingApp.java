@@ -26,7 +26,7 @@ public class BankingApp {
         LoginPage loginPage = new LoginPage(this, userService);
         SignupPage signupPage = new SignupPage(this, userService);
         DashboardPage dashboardPage = new DashboardPage(this, savingsService, currentAccountService, transferService,
-                transactionsPage);
+                transactionsPage, userService);
                 
         container.add(bankLogin, "bankLogin");
         container.add(bankDashboard, "bankDashboard");

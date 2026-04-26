@@ -20,7 +20,7 @@ public class Main {
                     userService);
             CurrentAccountService currentService = new CurrentAccountService(currentAccountRepository,
                     transactionRepository, userService);
-            TransferService transferService = new TransferService(userService, transactionRepository);
+            TransferService transferService = new TransferService(userService, transactionRepository, currentAccountRepository, savingsRepo);
 
             BankService bankService = new BankService(savingsRepo, currentAccountRepository, "SampleBank",
                     "SamplePassword");

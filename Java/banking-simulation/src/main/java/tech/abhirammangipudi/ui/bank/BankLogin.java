@@ -13,6 +13,8 @@ public class BankLogin extends JPanel {
         JTextField username = new JTextField();
         JPasswordField password = new JPasswordField();
         JButton login = new JButton("Login");
+        JButton back = new JButton("Back");
+        back.addActionListener(e -> app.showPage("landing"));
 
         login.addActionListener(e -> {
             String bankUName = username.getText();
@@ -32,5 +34,6 @@ public class BankLogin extends JPanel {
         add(new JLabel("Password:"));
         add(password);
         add(login);
+        add(back);
     }
 }

@@ -59,5 +59,15 @@ public class TransactionsPage extends JPanel {
         this.table = new JTable();
         this.transactionRepository = transactionRepository;
         add(new JScrollPane(table), BorderLayout.CENTER);
+        JButton back = new JButton("Back");
+        back.addActionListener(e -> {
+            Container parent = back.getParent();
+            if (parent.getParent().getName() == "bankDashboard") {
+                app.showPage("bankDashboard");
+            } else {
+                app.showPage("dashboard");
+            }
+        });
+        add(back);
     }
 }
