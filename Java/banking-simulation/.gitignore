@@ -25,3 +25,8 @@ replay_pid*
 
 # Target folder
 target/
+
+# JDTLS
+.classpath
+.project
+.settings
